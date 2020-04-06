@@ -1,0 +1,48 @@
+function [N_Q,N_R,T] = LLL(Q,R,M)
+%UNTITLED5 Summary of this function goes here
+%   Detailed explanation goes here
+% H=QR,HT=N_Q*N_R,T=I
+N_Q=Q;
+N_R=R;
+T=eye(M);%or T=eye(size(Q))
+k=2;
+c=3/4;  %1/4<c<1
+while k<M  %not k<=M
+    for p=k-1:-1:1
+        temp=N_R(p,k)/N_R(p,p);
+        temp=round(temp);
+        %if temp>=2
+        %    temp=2;
+        %elseif temp<=-2
+        %    temp=-2;
+        %else temp=temp;
+        %end
+        if temp~=0
+            N_R(1:p,k)=N_R(1:p,k)-temp*N_R(1:p,p);
+            T(:,k)=T(:,k)-temp*T(:,p);
+        end
+    end
+    if (c*N_R(k-1,k-1)^2)>(N_R(k,k)^2+N_R(k-1,k)^2)
+        temp1=N_R(:,k);
+        N_R(:,k)=N_R(:,k-1);
+        N_R(:,k-1)=temp1;
+        temp2=T(:,k);
+        T(:,k)=T(:,k-1);
+        T(:,k-1)=temp2;
+        norm=sqrt(N_R(k-1,k-1)^2+N_R(k,k-1)^2);
+        a=N_R(k-1,k-1)/norm;
+        b=N_R(k,k-1)/norm;
+        r(1,1)=a;
+        r(1,2)=b;
+        r(2,1)=-b;
+        r(2,2)=a;
+        N_R(k-1:k,k-1:M)=r*N_R(k-1:k,k-1:M);
+        N_Q(:,k-1:k)=N_Q(:,k-1:k)*r';
+        k=max(k-1,2);
+    else
+        k=k+1;
+    end
+end
+
+end
+
